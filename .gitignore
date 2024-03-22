@@ -1,3 +1,14 @@
+# STM32CubeMX Project Files
+*.mxproject
+*.ioc
+
+# uVision Project Files
+*.uvguix*
+*.uvoptx
+
+# Build Folder
+/MDK-ARM/ECE6780_Lab06
+
 # Prerequisites
 *.d
 
@@ -17,8 +28,8 @@
 *.pch
 
 # Libraries
-*.lib
-*.a
+#*.lib
+#*.a
 *.la
 *.lo
 
