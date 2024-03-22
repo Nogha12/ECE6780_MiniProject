@@ -1,5 +1,9 @@
-# ECE6780_MiniProject
-Final project for ECE 6780, Embedded Systems Programming.
+![Main](/assets/images/embedded.jpg)
 
-Project Members:
-Noah Lomu
+# ECE 6780 Embedded System Design -- Mini-Project
+**University of Utah, Electrical and Computer Engineering**
+
+### Project Members:
+
+- Noah Lomu
+- David Venegas
