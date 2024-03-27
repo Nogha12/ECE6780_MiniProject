@@ -7,7 +7,7 @@
 *.uvoptx
 
 # Build Folder
-/MDK-ARM/ECE6780_Lab06
+/MDK-ARM/ECE6780_MiniProject
 
 # Prerequisites
 *.d
