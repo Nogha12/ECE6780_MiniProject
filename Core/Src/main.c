@@ -65,14 +65,16 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
-  //int clkSpeed;
-  //int targetBaud = 115200;
+  
+  const int arrValue = 125;
   
   int returnValue;
   int16_t xValue;
   int16_t yValue;
   int16_t zValue;
+  int redPWMPercent;
+  int greenPWMPercent;
+  int bluePWMPercent;
   
   /* USER CODE END 1 */
 
@@ -95,10 +97,8 @@ int main(void)
   RCC->AHBENR |= RCC_AHBENR_GPIOBEN; // enable GPIO B clock
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN; // enable GPIO C clock
   RCC->APB1ENR |= RCC_APB1ENR_SPI2EN; // enable SPI 2 clock
-  //RCC->APB1ENR |= RCC_APB1ENR_USART3EN; // enable USART 3 clock
   
   // Configure GPIO C pins 6, 7, and 8 for PWM LED Strip signal generation
-  /*
   GPIOC->MODER &= ~(GPIO_MODER_MODER6_Msk | GPIO_MODER_MODER7_Msk | GPIO_MODER_MODER8_Msk);
   GPIOC->MODER |= (0x2 << GPIO_MODER_MODER6_Pos) | (0x2 << GPIO_MODER_MODER7_Pos) | 
                   (0x2 << GPIO_MODER_MODER8_Pos); // alternate mode
@@ -106,14 +106,15 @@ int main(void)
   GPIOC->PUPDR &= ~(GPIO_PUPDR_PUPDR6_Msk | GPIO_PUPDR_PUPDR7_Msk | GPIO_PUPDR_PUPDR8_Msk); // no pull-up/pull-down
   GPIOC->AFR[0] &= ~(GPIO_AFRL_AFSEL6 | GPIO_AFRL_AFSEL7); // alternate function 0
   GPIOC->AFR[1] &= ~(GPIO_AFRH_AFSEL8); // alternate function 0
-  */
   
   // Configure GPIO C pins 6, 7, 8, and 9 (LED pins)
+  /*
   GPIOC->MODER &= ~(GPIO_MODER_MODER6_Msk | GPIO_MODER_MODER7_Msk | GPIO_MODER_MODER8_Msk | GPIO_MODER_MODER9_Msk);
   GPIOC->MODER |= (0x1 << GPIO_MODER_MODER6_Pos) | (0x1 << GPIO_MODER_MODER7_Pos) | 
                   (0x1 << GPIO_MODER_MODER8_Pos) | (0x1 << GPIO_MODER_MODER9_Pos); // output mode
   GPIOC->OTYPER &= ~(GPIO_OTYPER_OT_6 | GPIO_OTYPER_OT_7 | GPIO_OTYPER_OT_8 | GPIO_OTYPER_OT_9); // push-pull
   GPIOC->PUPDR &= ~(GPIO_PUPDR_PUPDR6 | GPIO_PUPDR_PUPDR7 | GPIO_PUPDR_PUPDR8 | GPIO_PUPDR_PUPDR9); // no pull-up/pull-down
+  */
   
   /* NOTE:
      To connect the gyroscope via SPI, the following pins are used:
@@ -161,37 +162,37 @@ int main(void)
   
   // Set the timer 3 auto reload point to 125 to get to 800Hz
   TIM3->ARR &= 0x0;
-  TIM3->ARR |= 125;
+  TIM3->ARR |= arrValue;
   
   // Configure timer 3 channel 1 and 2
   TIM3->CCMR1 &= ~(TIM_CCMR1_CC1S_Msk | TIM_CCMR1_CC2S_Msk); // configure as output
   TIM3->CCMR1 |= TIM_CCMR1_OC1PE | TIM_CCMR1_OC2PE; // enable preload
   TIM3->CCMR1 &= ~(TIM_CCMR1_OC1M_Msk | TIM_CCMR1_OC2M_Msk);
-  TIM3->CCMR1 |= 0x6 << TIM_CCMR1_OC1M_Pos | 0x6 << TIM_CCMR1_OC2M_Pos; // PWM mode 1
+  TIM3->CCMR1 |= (0x6 << TIM_CCMR1_OC1M_Pos) | (0x6 << TIM_CCMR1_OC2M_Pos); // PWM mode 1
   
   // Configure timer 3 channel 3
   TIM3->CCMR2 &= ~(TIM_CCMR2_CC3S_Msk); // configure as output
   TIM3->CCMR2 |= TIM_CCMR2_OC3PE; // enable preload
-  TIM3->CCMR1 &= ~(TIM_CCMR2_OC3M_Msk);
-  TIM3->CCMR2 |= 0x6 << TIM_CCMR2_OC3M_Pos; // PWM mode 1
+  TIM3->CCMR2 &= ~(TIM_CCMR2_OC3M_Msk);
+  TIM3->CCMR2 |= (0x6 << TIM_CCMR2_OC3M_Pos); // PWM mode 1
   
   // Enable Capture/Compare for channels 1, 2, and 3
   TIM3->CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E;
   
-  // Set the compare registers to 20%, 60%, and 100%
+  // Set the compare registers to 100%, 20%, and 60%
   TIM3->CCR1 &= 0x0000;
-  TIM3->CCR1 |= 25;
+  TIM3->CCR1 |= (100*arrValue)/100;
   TIM3->CCR2 &= 0x0000;
-  TIM3->CCR2 |= 75;
+  TIM3->CCR2 |= (20*arrValue)/100;
   TIM3->CCR3 &= 0x0000;
-  TIM3->CCR3 |= 125;
+  TIM3->CCR3 |= (60*arrValue)/100;
   
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
   
-  //TIM3->CR1 |= TIM_CR1_CEN; // enable timer 3
+  TIM3->CR1 |= TIM_CR1_CEN; // enable timer 3
   
   GPIOC->ODR |= GPIO_ODR_0; // set pin C0 high when SPI is not ongoing
   SPI2->CR1 |= SPI_CR1_SPE; // enable SPI 2
@@ -206,6 +207,10 @@ int main(void)
                            (I3G4250D_CTRL_REG1_Xen | I3G4250D_CTRL_REG1_Yen | 
                             I3G4250D_CTRL_REG1_Zen | I3G4250D_CTRL_REG1_PD)
                           ); // enable X, Y, Z, and normal mode
+  
+  redPWMPercent = 0;
+  greenPWMPercent = 0;
+  bluePWMPercent = 0;
   
   /* USER CODE END 2 */
 
@@ -222,29 +227,71 @@ int main(void)
     yValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Y_L_Addr, 2); // Read Y low and high
     zValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Z_L_Addr, 2); // Read Z low and high
     
+    // *****************************************************
+    // **** gyro output to brightness modulation logic *****
+    // *****************************************************
     if (xValue > 4000) // x positive
     {
-      GPIOC->ODR |= GPIO_ODR_8; // Turn on pin C8 (orange LED)
-      GPIOC->ODR &= ~(GPIO_ODR_9); // Turn off pin C9 (green LED)
+      redPWMPercent++; // increase red brightness
+      if (redPWMPercent > arrValue)
+      {
+        redPWMPercent = arrValue;
+      }
     }
     else if (xValue < -4000) // x negative
     {
-      GPIOC->ODR |= GPIO_ODR_9; // Turn on pin C9 (green LED)
-      GPIOC->ODR &= ~(GPIO_ODR_8); // Turn off pin C8 (orange LED)
+      redPWMPercent--; // decrease red brightness
+      if (redPWMPercent < 0)
+      {
+        redPWMPercent = 0;
+      }
     }
     
     if (yValue > 4000) // y positive
     {
-      GPIOC->ODR |= GPIO_ODR_7; // Turn on pin C7 (red LED)
-      GPIOC->ODR &= ~(GPIO_ODR_6); // Turn off pin C6 (blue LED)
+      greenPWMPercent++; // increase green brightness
+      if (greenPWMPercent > arrValue)
+      {
+        greenPWMPercent = arrValue;
+      }
     }
     else if (yValue < -4000) // y negative
     {
-      GPIOC->ODR |= GPIO_ODR_6; // Turn on pin C6 (blue LED)
-      GPIOC->ODR &= ~(GPIO_ODR_7); // Turn off pin C7 (red LED)
+      greenPWMPercent--; // decrease green brightness
+      if (greenPWMPercent < 0)
+      {
+        greenPWMPercent = 0;
+      }
     }
     
-    HAL_Delay(100);
+    if (zValue > 4000) // z positive
+    {
+      bluePWMPercent++; // increase blue brightness
+      if (bluePWMPercent > arrValue)
+      {
+        bluePWMPercent = arrValue;
+      }
+    }
+    else if (zValue < -4000) // z negative
+    {
+      bluePWMPercent--; // decrease blue brightness
+      if (bluePWMPercent < 0)
+      {
+        bluePWMPercent = 0;
+      }
+    }
+    
+    /* NOTE: Make sure the colors here match the LED strip
+       They do not match right now
+     */
+    TIM3->CCR1 &= 0x0000;
+    TIM3->CCR1 |= (redPWMPercent*arrValue)/100;
+    TIM3->CCR2 &= 0x0000;
+    TIM3->CCR2 |= (greenPWMPercent*arrValue)/100;
+    TIM3->CCR3 &= 0x0000;
+    TIM3->CCR3 |= (bluePWMPercent*arrValue)/100;
+    
+    HAL_Delay(20);
   }
   /* USER CODE END 3 */
 }
