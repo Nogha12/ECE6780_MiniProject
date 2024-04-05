@@ -94,15 +94,6 @@
 
 /* USER CODE BEGIN PV */
 
-int testVar01 = 0;
-int testVar02 = 0;
-int testVar03 = 0;
-int testVar04 = 0;
-int testVar05 = 0;
-int testVar06 = 0;
-int testVar07 = 0;
-int testVar08 = 0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -131,9 +122,9 @@ int main(void)
   //int targetBaud = 115200;
   
   int returnValue;
-  int xValue;
-  int yValue;
-  int zValue;
+  int16_t xValue;
+  int16_t yValue;
+  int16_t zValue;
   
   /* USER CODE END 1 */
 
@@ -152,11 +143,9 @@ int main(void)
   /* USER CODE BEGIN SysInit */
   
   // Enable clocks
-  //RCC->APB1ENR |= RCC_APB1ENR_TIM2EN; // timer 2
   RCC->APB1ENR |= RCC_APB1ENR_TIM3EN; // timer 3
   RCC->AHBENR |= RCC_AHBENR_GPIOBEN; // enable GPIO B clock
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN; // enable GPIO C clock
-  //RCC->APB1ENR |= RCC_APB1ENR_I2C2EN; // enable I2C 2 clock
   RCC->APB1ENR |= RCC_APB1ENR_SPI2EN; // enable SPI 2 clock
   //RCC->APB1ENR |= RCC_APB1ENR_USART3EN; // enable USART 3 clock
   
@@ -217,21 +206,7 @@ int main(void)
   SPI2->CR2 |= (0x7 << SPI_CR2_DS_Pos); // set data size to 8-bit
   SPI2->CR2 |= SPI_CR2_SSOE; // slave select output enable
   SPI2->CR2 |= SPI_CR2_FRXTH; // Receive buffer not empty at 8 bits
-  
-  // Set the prescaler to 8000
-  //TIM2->PSC &= 0x0;
-  //TIM2->PSC |= 7999;
-  
-  // Set the auto reload point to 50
-  //TIM2->ARR &= 0x0;
-  //TIM2->ARR |= 250;
-  
-  // Enable update event and have it cause an interrupt
-  //TIM2->CR1 &= ~(0x1 << 1);
-  //TIM2->DIER |= 0x1 << 0;
-  //NVIC_EnableIRQ(TIM2_IRQn);
-  //NVIC_SetPriority(TIM2_IRQn, 2);
-  
+    
   // Set the timer 3 prescaler to 80 to get to 10us resolution
   TIM3->PSC &= 0x0;
   TIM3->PSC |= 79;
@@ -268,19 +243,14 @@ int main(void)
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
   
-  //TIM2->CR1 |= TIM_CR1_CEN; // enable timer 2
   //TIM3->CR1 |= TIM_CR1_CEN; // enable timer 3
   
   GPIOC->ODR |= GPIO_ODR_0; // set pin C0 high when SPI is not ongoing
   SPI2->CR1 |= SPI_CR1_SPE; // enable SPI 2
   
   returnValue = I3G4250D_ReadRegister(I3G4250D_WHO_AM_I_Addr, 1); // Read WHO_AM_I
-  
-  testVar01 = returnValue;
-  
   if (returnValue != I3G4250D_WHO_AM_I_Value) // Verify that the gyroscope matches the known WHO_AM_I
   {
-    testVar02 = 1;
     Error_Handler();
   }
   
@@ -288,14 +258,6 @@ int main(void)
                            (I3G4250D_CTRL_REG1_Xen | I3G4250D_CTRL_REG1_Yen | 
                             I3G4250D_CTRL_REG1_Zen | I3G4250D_CTRL_REG1_PD)
                           ); // enable X, Y, Z, and normal mode
-  
-  returnValue = I3G4250D_ReadRegister(I3G4250D_CTROL_REG1_Addr, 1); // Read CTROL_REG1
-  
-  testVar03 = returnValue;
-  
-  xValue = 0;
-  yValue = 0;
-  zValue = 0;
   
   /* USER CODE END 2 */
 
@@ -308,31 +270,27 @@ int main(void)
     /* USER CODE BEGIN 3 */
     
     // read gyro values value
-    xValue = I3G4250D_ReadRegister(I3G4250D_OUT_X_L_Addr, 2); // Read X low and high
-    yValue = I3G4250D_ReadRegister(I3G4250D_OUT_Y_L_Addr, 2); // Read Y low and high
-    zValue = I3G4250D_ReadRegister(I3G4250D_OUT_Z_L_Addr, 2); // Read Z low and high
+    xValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_X_L_Addr, 2); // Read X low and high
+    yValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Y_L_Addr, 2); // Read Y low and high
+    zValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Z_L_Addr, 2); // Read Z low and high
     
-    testVar04 = xValue;
-    testVar05 = yValue;
-    testVar06 = zValue;
-    
-    if ((int16_t)xValue > 4000) // x positive
+    if (xValue > 4000) // x positive
     {
       GPIOC->ODR |= GPIO_ODR_8; // Turn on pin C8 (orange LED)
       GPIOC->ODR &= ~(GPIO_ODR_9); // Turn off pin C9 (green LED)
     }
-    else if ((int16_t)xValue < -4000) // x negative
+    else if (xValue < -4000) // x negative
     {
       GPIOC->ODR |= GPIO_ODR_9; // Turn on pin C9 (green LED)
       GPIOC->ODR &= ~(GPIO_ODR_8); // Turn off pin C8 (orange LED)
     }
     
-    if ((int16_t)yValue > 4000) // y positive
+    if (yValue > 4000) // y positive
     {
       GPIOC->ODR |= GPIO_ODR_7; // Turn on pin C7 (red LED)
       GPIOC->ODR &= ~(GPIO_ODR_6); // Turn off pin C6 (blue LED)
     }
-    else if ((int16_t)yValue < -4000) // y negative
+    else if (yValue < -4000) // y negative
     {
       GPIOC->ODR |= GPIO_ODR_6; // Turn on pin C6 (blue LED)
       GPIOC->ODR &= ~(GPIO_ODR_7); // Turn off pin C7 (red LED)
@@ -393,13 +351,14 @@ int I3G4250D_ReadRegister(uint8_t registerAddr, int bytesToRead)
   {
     ctrlByte &= ~(I3G4250D_SPI_MS); // set to single-byte
   } 
-  else if (bytesToRead > sizeof(int) || bytesToRead > sizeof(int) < 1)
+  else if (bytesToRead > sizeof(int) || bytesToRead < 1)
   {
+    Error_Handler();
     return -1;
   }
   
   GPIOC->ODR &= ~(GPIO_ODR_0); // enable I3G4250D
-  HAL_Delay(1);
+  
   while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
   *(uint8_t *)&(SPI2->DR) = ctrlByte; // transmit the control byte
   while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
@@ -407,27 +366,17 @@ int I3G4250D_ReadRegister(uint8_t registerAddr, int bytesToRead)
   
   (void)SPI2->DR; // clear byte from read register
   
-  testVar07 = data;
-  
   for (int i = 0; i < bytesToRead; i++)
   {
     *(uint8_t *)&(SPI2->DR) = 0xFF; // transmit a dummy byte
-  }
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
-  while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
-  
-  for (int i = 0; i < bytesToRead; i++)
-  {
-    //while ((SPI2->SR & SPI_SR_RXNE) == 0); // wait for receive buffer to fill
+    while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+    while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
+    
     inByte = (uint8_t)SPI2->DR; // read byte from data register
-    testVar08 = inByte;
     data |= (inByte & 0xFF) << i*8; // shift byte into data
   }
-  //while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
-  GPIOC->ODR |= GPIO_ODR_0; // disable I3G4250D
-  HAL_Delay(1);
   
-  while (SPI2->SR & SPI_SR_RXNE) (void)SPI2->DR; // clear the receive buffer
+  GPIOC->ODR |= GPIO_ODR_0; // disable I3G4250D
   
   return data;
 }
@@ -440,13 +389,17 @@ void I3G4250D_WriteToRegister(uint8_t registerAddr, uint8_t data)
   uint8_t ctrlByte = registerAddr & ~(I3G4250D_SPI_RW | I3G4250D_SPI_MS); // set to write and single byte
   
   GPIOC->ODR &= ~(GPIO_ODR_0); // enable I3G4250D
-  HAL_Delay(1);
+  
   while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
   *(uint8_t *)&(SPI2->DR) = ctrlByte; // transmit the control byte
-  *(uint8_t *)&(SPI2->DR) = data; // transmit the data
+  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
   while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
+  
+  *(uint8_t *)&(SPI2->DR) = data; // transmit the data
+  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
+  
   GPIOC->ODR |= GPIO_ODR_0; // disable I3G4250D
-  HAL_Delay(1);
   
   while (SPI2->SR & SPI_SR_RXNE) (void)SPI2->DR; // clear the receive buffer
   
