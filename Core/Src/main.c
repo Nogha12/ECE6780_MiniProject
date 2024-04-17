@@ -29,6 +29,20 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+typedef enum
+{
+  RED = 'R',
+  GREEN = 'G',
+  BLUE = 'B'
+} Color;
+
+typedef struct
+{
+  const Color color;
+  char data;
+} LED_Data;
+
+  
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -53,6 +67,7 @@ void SystemClock_Config(void);
 
 void USART3_TxByte(uint8_t data);
 void USART3_txString(char* data);
+void USART3_txColorData(LED_Data data);
 uint8_t USART3_RxByte(void);
 
 /* USER CODE END PFP */
@@ -84,9 +99,9 @@ int main(void)
   uint8_t greenPWMValue;
   uint8_t bluePWMValue;
   
-  uint8_t redData[] = {'R', 0};
-  uint8_t greenData[] = {'G', 0};
-  uint8_t blueData[] = {'B', 0};
+  LED_Data redData = {RED, NULL};
+  LED_Data greenData = {GREEN, NULL};
+  LED_Data blueData = {BLUE, NULL};
   
   /* USER CODE END 1 */
 
@@ -271,14 +286,14 @@ int main(void)
     }
     
     // Assign PWM values to data to send over USART 3
-    redData[1] = redPWMValue;
-    greenData[1] = greenPWMValue;
-    blueData[1] = bluePWMValue;
+    redData.data = redPWMValue;
+    greenData.data = greenPWMValue;
+    blueData.data = bluePWMValue;
     
     // Send color data over USART 3
-    USART3_txString((char*)redData);
-    USART3_txString((char*)greenData);
-    USART3_txString((char*)blueData);
+    USART3_txColorData(redData);
+    USART3_txColorData(greenData);
+    USART3_txColorData(blueData);
     
     /* NOTE: Make sure the colors here match the LED strip
        They do not match right now
@@ -290,7 +305,7 @@ int main(void)
     TIM3->CCR3 &= 0x0000;
     TIM3->CCR3 |= bluePWMValue;
     
-    HAL_Delay(20);
+    HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
@@ -353,9 +368,9 @@ int I3G4250D_ReadRegister(uint8_t registerAddr, int bytesToRead)
   
   GPIOC->ODR &= ~(GPIO_ODR_0); // enable I3G4250D
   
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
   *(uint8_t *)&(SPI2->DR) = ctrlByte; // transmit the control byte
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
   while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
   
   (void)SPI2->DR; // clear byte from read register
@@ -363,7 +378,7 @@ int I3G4250D_ReadRegister(uint8_t registerAddr, int bytesToRead)
   for (int i = 0; i < bytesToRead; i++)
   {
     *(uint8_t *)&(SPI2->DR) = 0xFF; // transmit a dummy byte
-    while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+    while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
     while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
     
     inByte = (uint8_t)SPI2->DR; // read byte from data register
@@ -384,13 +399,13 @@ void I3G4250D_WriteToRegister(uint8_t registerAddr, uint8_t data)
   
   GPIOC->ODR &= ~(GPIO_ODR_0); // enable I3G4250D
   
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
   *(uint8_t *)&(SPI2->DR) = ctrlByte; // transmit the control byte
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
   while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
   
   *(uint8_t *)&(SPI2->DR) = data; // transmit the data
-  while ((SPI2->SR & SPI_SR_TXE) == 0); // wait for transmit buffer to be empty
+  while (!(SPI2->SR & SPI_SR_TXE)); // wait for transmit buffer to be empty
   while (SPI2->SR & SPI_SR_BSY); // wait for SPI to finish
   
   GPIOC->ODR |= GPIO_ODR_0; // disable I3G4250D
@@ -405,7 +420,7 @@ void I3G4250D_WriteToRegister(uint8_t registerAddr, uint8_t data)
   */
 void USART3_TxByte(uint8_t data)
 {
-  while ((USART3->ISR & (0x1 << 7)) == 0x0);
+  while (!(USART3->ISR & USART_ISR_TXE));
   USART3->TDR = data;
   return;
 }
@@ -419,6 +434,16 @@ void USART3_txString(char* data)
   {
     USART3_TxByte((uint8_t)data[i]);
   }
+  return;
+}
+
+/**
+  * @brief Transmits color data via USART 3
+  */
+void USART3_txColorData(LED_Data data)
+{
+  USART3_TxByte((uint8_t)data.color);
+  USART3_TxByte((uint8_t)data.data);
   return;
 }
 
