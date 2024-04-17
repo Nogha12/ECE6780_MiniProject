@@ -409,6 +409,16 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f0xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>i3g4250d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\i3g4250d.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

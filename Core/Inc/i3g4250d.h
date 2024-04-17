@@ -64,6 +64,10 @@
 #define I3G4250D_CTRL_REG1_DR_0     (0x1U << I3G4250D_CTRL_REG1_DR_Pos)              /*!< 0x80 */
 #define I3G4250D_CTRL_REG1_DR_1     (0x2U << I3G4250D_CTRL_REG1_DR_Pos)              /*!< 0x40 */
 
+/****************  Function prototypes (setup/initialization)  ****************/
+void I3G4250D_Initialize();
+void I3G4250D_Enable();
+
 /*********************  Function prototypes (read/write)  *********************/
 int I3G4250D_ReadRegister(uint8_t registerAddr, int bytesToRead);
 void I3G4250D_WriteToRegister(uint8_t registerAddr, uint8_t data);
