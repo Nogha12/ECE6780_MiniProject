@@ -37,6 +37,19 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+typedef enum
+{
+  RED = 'R',
+  GREEN = 'G',
+  BLUE = 'B'
+} Color;
+
+typedef struct
+{
+  const Color color;
+  uint8_t data;
+} LED_Data;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -53,7 +66,9 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void USART3_txColorData(LED_Data data);
+void LED_Process_Color(uint8_t data);
+void LED_Transmit_Loop();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

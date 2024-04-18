@@ -18,6 +18,6 @@ void USART3_Enable();
 /*********************  Function prototypes (read/write)  *********************/
 void USART3_TxByte(uint8_t data);
 void USART3_txString(char* data);
-uint8_t USART3_RxByte(void);
+uint8_t USART3_RxByte();
 
 #endif /* __USART_H */

@@ -16,7 +16,7 @@ USART_TypeDef* activeUSART;
 /*                        USART Set Up and Initialization                     */
 /******************************************************************************/
 /**
-  * @brief Fully initialize use of USART 3
+  * @brief Fully initialize use of USART 3 via pins C10 (Tx) and C11 (Rx)
   */
 void USART3_Initialize(int targetBaud)
 {
@@ -41,6 +41,12 @@ void USART3_Initialize(int targetBaud)
   USART3->CR1 |= USART_CR1_RXNEIE; // enable interrupts from receive register not empty
   USART3->BRR &= 0x0000;
   USART3->BRR |= clkSpeed / targetBaud; // set baud rate clock divisor
+  
+  // Configure interrupts
+  NVIC_EnableIRQ(USART3_4_IRQn); // enable USART 3 interrupts
+  NVIC_SetPriority(USART3_4_IRQn, 2);
+  
+  activeUSART = USART3;
 }
 
 /**
@@ -79,7 +85,7 @@ void USART3_txString(char* data)
 /**
   * @brief Receives a byte via USART 3
   */
-uint8_t USART3_RxByte(void)
+uint8_t USART3_RxByte()
 {
   while (!(USART3->ISR & USART_ISR_RXNE));
   return USART3->RDR;

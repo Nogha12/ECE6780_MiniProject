@@ -142,4 +142,12 @@ void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 
+/**
+  * @brief This function handles USART reception; passes data to the LED color
+  */
+void USART3_4_IRQHandler(void)
+{
+  LED_Process_Color(USART3->RDR);
+}
+
 /* USER CODE END 1 */
