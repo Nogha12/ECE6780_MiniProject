@@ -188,29 +188,29 @@ int main(void)
     // *****************************************************
     // **** gyro output to brightness modulation logic *****
     // *****************************************************
-    if (xValue > 4000 && redPWMValue < arrValue) // x positive
+    if (xValue > 2000 && redPWMValue < arrValue) // x positive
     {
       redPWMValue++; // increase red brightness
     }
-    else if (xValue < -4000 && redPWMValue > 0) // x negative
+    else if (xValue < -2000 && redPWMValue > 0) // x negative
     {
       redPWMValue--; // decrease red brightness
     }
     
-    if (yValue > 4000 && greenPWMValue < arrValue) // y positive
+    if (yValue > 2000 && greenPWMValue < arrValue) // y positive
     {
       greenPWMValue++; // increase green brightness
     }
-    else if (yValue < -4000 && greenPWMValue > 0) // y negative
+    else if (yValue < -2000 && greenPWMValue > 0) // y negative
     {
       greenPWMValue--; // decrease green brightness
     }
     
-    if (zValue > 4000 && bluePWMValue < arrValue) // z positive
+    if (zValue > 2000 && bluePWMValue < arrValue) // z positive
     {
       bluePWMValue++; // increase blue brightness
     }
-    else if (zValue < -4000 && bluePWMValue > 0) // z negative
+    else if (zValue < -2000 && bluePWMValue > 0) // z negative
     {
       bluePWMValue--; // decrease blue brightness
     }
