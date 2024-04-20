@@ -3,6 +3,7 @@
 "tsc_test\main.o"
 "tsc_test\stm32f0xx_it.o"
 "tsc_test\stm32f0xx_hal_msp.o"
+"tsc_test\tsc.o"
 "tsc_test\stm32f0xx_hal_tim.o"
 "tsc_test\stm32f0xx_hal_tim_ex.o"
 "tsc_test\stm32f0xx_hal_rcc.o"

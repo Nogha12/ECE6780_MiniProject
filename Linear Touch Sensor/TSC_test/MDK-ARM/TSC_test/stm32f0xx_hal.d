@@ -8,9 +8,9 @@ tsc_test/stm32f0xx_hal.o: \
   ..\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f072xb.h \
   ..\Drivers\CMSIS\Include\core_cm0.h \
   C:\Keil_v5\ARM\ARMCLANG\include\stdint.h \
-  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\TSC_test\Drivers\CMSIS\Include\cmsis_version.h \
-  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\TSC_test\Drivers\CMSIS\Include\cmsis_compiler.h \
-  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\TSC_test\Drivers\CMSIS\Include\cmsis_armclang.h \
+  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\Mini_Project\ECE6780_MiniProject\Linear\ Touch\ Sensor\TSC_test\Drivers\CMSIS\Include\cmsis_version.h \
+  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\Mini_Project\ECE6780_MiniProject\Linear\ Touch\ Sensor\TSC_test\Drivers\CMSIS\Include\cmsis_compiler.h \
+  C:\Users\Juan\ David\ Venegas\ S\Desktop\U\ of\ U\Spring\ 2024\ECE\ 6780\Labs\Mini_Project\ECE6780_MiniProject\Linear\ Touch\ Sensor\TSC_test\Drivers\CMSIS\Include\cmsis_armclang.h \
   C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h \
   C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h \
   ..\Drivers\CMSIS\Device\ST\STM32F0xx\Include\system_stm32f0xx.h \

@@ -30,10 +30,6 @@ void Trans_Character(char ch);
 void Trans_String(size_t n, char string[]);
 char* itoa(int value, char* result, int base);
 
-/* Global Variables -----------------------------------------------------------*/
-uint32_t Rec_Reg;
-int Flag_New_Data;
-
 /**
   * @brief  The application entry point.
   * @retval int
@@ -142,60 +138,36 @@ int main(void)
 	
 	// 				TSC SETUP 				  //
 	//														//
-	// RCC to enable the TSC peripheral clock
+	// RCC to enable the TSC, GPIOA, GPIOB peripheral clock
 	RCC->AHBENR |= RCC_AHBENR_TSCEN;
-	// RCC to enable the GPIOx peripherals
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	// Capacitor (sensor): PA2 AF3 ---> Push-Pull
-	GPIOA->MODER |= (1 << 5);
-	GPIOA->MODER &= ~(1 << 4);
-	GPIOA->AFR[0] &= ~(1 << 11);
-	GPIOA->AFR[0] &= ~(1 << 10);
-	GPIOA->AFR[0] |= (1 << 9);
-	GPIOA->AFR[0] |= (1 << 8);
+	// Channel (sensor): PA2 AF3 ---> Push-Pull
+	GPIOA->MODER |= GPIO_MODER_MODER2_1;
+	GPIOA->AFR[0] |= 0x00000300;
 	GPIOA->OTYPER &= ~(1 << 2);
-	// Sampling IOs: PA3 AF3, PA7 AF3, PB1 AF3 ----> Open-Drain 
-	GPIOA->MODER |= (1 << 7);
-	GPIOA->MODER &= ~(1 << 6);
-	GPIOA->AFR[0] &= ~(1 << 15);
-	GPIOA->AFR[0] &= ~(1 << 14);
-	GPIOA->AFR[0] |= (1 << 13);
-	GPIOA->AFR[0] |= (1 << 12); 
-	GPIOA->OTYPER |= (1 << 3);
-
-	GPIOA->MODER |= (1 << 15);
-	GPIOA->MODER &= ~(1 << 14);
-	GPIOA->AFR[0] &= ~(1 << 31);
-	GPIOA->AFR[0] &= ~(1 << 30);
-	GPIOA->AFR[0] |= (1 << 29);
-	GPIOA->AFR[0] |= (1 << 28); 
-	GPIOA->OTYPER |= (1 << 7);	
-	
-	GPIOB->MODER |= (1 << 3);
-	GPIOB->MODER &= ~(1 << 2);
-	GPIOB->AFR[0] &= ~(1 << 7);
-	GPIOB->AFR[0] &= ~(1 << 6);
-	GPIOB->AFR[0] |= (1 << 5);
-	GPIOB->AFR[0] |= (1 << 4); 
+	// Capacitor Sampling IOs: PA3 AF3, PA7 AF3, PB1 AF3 ----> Open-Drain 
+	GPIOA->MODER |= (GPIO_MODER_MODER3_1 | GPIO_MODER_MODER7_1);
+	GPIOA->AFR[0] |= (0x00003000 | 0x30000000);
+	GPIOA->OTYPER |= ((1 << 3) | (1 << 7));
+	GPIOB->MODER |= GPIO_MODER_MODER1_1;
+	GPIOB->AFR[0] |= 0x00000030; 
 	GPIOB->OTYPER |= (1 << 1);
 	// Acquisition Mode Normal
-	TSC->CR &= ~(1 << 2);
+	TSC->CR &= ~(TSC_CR_AM);
 	// Pulse High Length 1 cycle
 	TSC->CR &= ~((1 << 31) | (1 << 30) | (1 << 29) | (1 << 28));
 	// Pulse Low Length 1 cycle
 	TSC->CR &= ~((1 << 27) | (1 << 26) | (1 << 25) | (1 << 24));
 	// IO Float mode
-	TSC->CR |= (1 << 4);
+	TSC->CR |= TSC_CR_IODEF;
 	// Max Count Interrupt disable
 	TSC->IER &= ~(1 << 1);
 	// Max Count Value: 16383
-	TSC->CR |= (1 << 7);
-	TSC->CR |= (1 << 6);
+	TSC->CR |= (1 << 7) | (1 << 6);
 	TSC->CR &= ~(1 << 5);
 	// Pulse Generator Prescaler: 64
-	TSC->CR |= (1 << 14);
-	TSC->CR |= (1 << 13);
+	TSC->CR |= (1 << 14) |(1 << 13);
 	TSC->CR &= ~(1 << 12);
 	// Spread Spectrum disable
 	TSC->CR &= ~(1 << 16);
@@ -229,10 +201,7 @@ int main(void)
 		// Enable G1_IO4, , G2_IO4, G3_IO3 as sampling
 		TSC->IOSCR |= ((1 << 3) | (1 << 7) | (1 << 10));
 		// Enable G1, G2, G3 Analog group
-		TSC->IOGCSR |= (1 << 0);
-		TSC->IOGCSR |= (1 << 1);
-		TSC->IOGCSR |= (1 << 2);
-		
+		TSC->IOGCSR |= ((1 << 0) |(1 << 1) | (1 << 2));
 		
 		// Wait for the completion flag, or an interrupt and read the counter values
 		while((TSC->ISR & TSC_ISR_EOAF) == TSC_ISR_EOAF)
@@ -284,7 +253,7 @@ int main(void)
 			GPIOC->ODR &= ~(1 << 8);
 		}
 		
-		//HAL_Delay(100); // SLOW DATA CAPTURE FOR TESTING
+		HAL_Delay(100); // SLOW DATA CAPTURE FOR TESTING
 		
 		
   }
