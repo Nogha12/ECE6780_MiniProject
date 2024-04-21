@@ -49,8 +49,6 @@
 const int arrValue = 255;
 const int targetBaud = 9600;
 
-int isReceiving;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,8 +73,6 @@ void LED_Transmit_Loop();
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  
-  isReceiving = 0;
   
   /* USER CODE END 1 */
 
@@ -157,7 +153,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     
     LED_Transmit_Loop();
-    HAL_Delay(10);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -231,29 +227,29 @@ void LED_Transmit_Loop()
   yValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Y_L_Addr, 2); // Read Y low and high
   zValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Z_L_Addr, 2); // Read Z low and high
 
-  if (xValue > 2000 && redPWMValue < arrValue) // x positive
+  if (xValue > 4000 && redPWMValue < arrValue) // x positive
   {
     redPWMValue++; // increase red brightness
   }
-  else if (xValue < -2000 && redPWMValue > 0) // x negative
+  else if (xValue < -4000 && redPWMValue > 0) // x negative
   {
     redPWMValue--; // decrease red brightness
   }
   
-  if (yValue > 2000 && greenPWMValue < arrValue) // y positive
+  if (yValue > 4000 && greenPWMValue < arrValue) // y positive
   {
     greenPWMValue++; // increase green brightness
   }
-  else if (yValue < -2000 && greenPWMValue > 0) // y negative
+  else if (yValue < -4000 && greenPWMValue > 0) // y negative
   {
     greenPWMValue--; // decrease green brightness
   }
   
-  if (zValue > 2000 && bluePWMValue < arrValue) // z positive
+  if (zValue > 4000 && bluePWMValue < arrValue) // z positive
   {
     bluePWMValue++; // increase blue brightness
   }
-  else if (zValue < -2000 && bluePWMValue > 0) // z negative
+  else if (zValue < -4000 && bluePWMValue > 0) // z negative
   {
     bluePWMValue--; // decrease blue brightness
   }
@@ -275,6 +271,9 @@ void LED_Transmit_Loop()
 void LED_Process_Color(uint8_t data)
 {
   static Color activeColor = NULL;
+  static uint8_t redPWMValue = 0;
+  static uint8_t greenPWMValue = 0;
+  static uint8_t bluePWMValue = 0;
   
   if (activeColor == NULL)
   {
@@ -299,21 +298,35 @@ void LED_Process_Color(uint8_t data)
     switch (activeColor)
     {
       case RED:
-        TIM3->CCR1 = data;
+        if (data < redPWMValue + 5 || data > redPWMValue - 5)
+        {
+          redPWMValue = data;
+        }
         activeColor = NULL;
         break;
       case GREEN:
-        TIM3->CCR2 = data;
+        if (data < greenPWMValue + 5 || data > greenPWMValue - 5)
+        {
+          greenPWMValue = data;
+        }
         activeColor = NULL;
         break;
       case BLUE:
-        TIM3->CCR3 = data;
+        if (data < bluePWMValue + 5 || data > bluePWMValue - 5)
+        {
+          bluePWMValue = data;
+        }
         activeColor = NULL;
         break;
       default:
         activeColor = NULL;
     }
   }
+  
+  TIM3->CCR1 = redPWMValue;
+  TIM3->CCR2 = greenPWMValue;
+  TIM3->CCR3 = bluePWMValue;
+  
   return;
 }
 
