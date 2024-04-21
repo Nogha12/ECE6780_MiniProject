@@ -49,6 +49,7 @@
 
 const int arrValue = 255;
 const int targetBaud = 9600;
+const int gyroSensitivity = 4000;
 
 /* USER CODE END PV */
 
@@ -213,10 +214,6 @@ void USART3_txColorData(LED_Data data)
   */
 void LED_Transmit_Loop()
 {
-  static int16_t xValue;
-  static int16_t yValue;
-  static int16_t zValue;
-  
   static uint8_t redPWMValue = 0;
   static uint8_t greenPWMValue = 0;
   static uint8_t bluePWMValue = 0;
@@ -224,60 +221,64 @@ void LED_Transmit_Loop()
   static LED_Data redData = {RED, NULL};
   static LED_Data greenData = {GREEN, NULL};
   static LED_Data blueData = {BLUE, NULL};
+
+  int16_t xValue;
+  int16_t yValue;
+  int16_t zValue;
 	
-	int AcquisitionValue = 0;
+	int AcquisitionValue;
   
   // read gyro values value
   xValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_X_L_Addr, 2); // Read X low and high
   yValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Y_L_Addr, 2); // Read Y low and high
   zValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_Z_L_Addr, 2); // Read Z low and high
 
-  if (xValue > 4000 && redPWMValue < arrValue) // x positive
+  if ((xValue > gyroSensitivity) && (redPWMValue < arrValue)) // x positive
   {
     redPWMValue++; // increase red brightness
   }
-  else if (xValue < -4000 && redPWMValue > 0) // x negative
+  else if ((xValue < -gyroSensitivity) && (redPWMValue > 0)) // x negative
   {
     redPWMValue--; // decrease red brightness
   }
   
-  if (yValue > 4000 && greenPWMValue < arrValue) // y positive
+  if ((yValue > gyroSensitivity) && (greenPWMValue < arrValue)) // y positive
   {
     greenPWMValue++; // increase green brightness
   }
-  else if (yValue < -4000 && greenPWMValue > 0) // y negative
+  else if ((yValue < -gyroSensitivity) && (greenPWMValue > 0)) // y negative
   {
     greenPWMValue--; // decrease green brightness
   }
   
-  if (zValue > 4000 && bluePWMValue < arrValue) // z positive
+  if ((zValue > gyroSensitivity) && (bluePWMValue < arrValue)) // z positive
   {
     bluePWMValue++; // increase blue brightness
   }
-  else if (zValue < -4000 && bluePWMValue > 0) // z negative
+  else if ((zValue < -gyroSensitivity) && (bluePWMValue > 0)) // z negative
   {
     bluePWMValue--; // decrease blue brightness
   }
 	
-	// Touch sensing acquisition
-	AcquisitionValue = TSC_acquisition();
+  // Touch sensing acquisition
+  AcquisitionValue = TSC_acquisition();
 	
-		if ((AcquisitionValue > TSC_MIN_THRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
-		{
-			if (AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD)
-			{
-				redPWMValue++;
-				greenPWMValue++;
-				bluePWMValue++;
-				
-				if (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD)
-				{
-					redPWMValue++;
-					greenPWMValue++;
-					bluePWMValue++;
-				}
-			}
-		}
+  if ((AcquisitionValue > TSC_MIN_THRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
+  {
+    if (AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD)
+    {
+      redPWMValue++;
+      greenPWMValue++;
+      bluePWMValue++;
+      
+      if (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD)
+      {
+        redPWMValue++;
+        greenPWMValue++;
+        bluePWMValue++;
+      }
+    }
+  }
 				
   
   // Assign PWM values to data to send over USART 3
