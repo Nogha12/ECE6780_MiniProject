@@ -13,7 +13,8 @@
 
 /************************  Sensing value definitions  *************************/
 #define TSC_MIN_THRESHOLD       	(1000)
-#define TSC_LOW_MAXTHRESHOLD    	(1347)
+#define TSC_MAX_THRESHOLD       	(1400)
+#define TSC_LOW_MAXTHRESHOLD    	(1340)
 #define TSC_MEDIUM_MAXTHRESHOLD 	(1325)
 #define TSC_HIGH_MAXTHRESHOLD   	(1300)
 

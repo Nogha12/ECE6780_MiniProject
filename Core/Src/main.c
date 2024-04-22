@@ -49,7 +49,7 @@
 
 const int arrValue = 255;
 const int targetBaud = 9600;
-const int gyroSensitivity = 4000;
+const int gyroSensitivity = 2000;
 
 /* USER CODE END PV */
 
@@ -260,25 +260,47 @@ void LED_Transmit_Loop()
     bluePWMValue--; // decrease blue brightness
   }
 	
-  // Touch sensing acquisition
-  AcquisitionValue = TSC_acquisition();
+	// Touch sensing acquisition
+	AcquisitionValue = TSC_acquisition();
 	
-  if ((AcquisitionValue > TSC_MIN_THRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
-  {
-    if (AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD)
-    {
-      redPWMValue++;
-      greenPWMValue++;
-      bluePWMValue++;
-      
-      if (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD)
-      {
-        redPWMValue++;
-        greenPWMValue++;
-        bluePWMValue++;
-      }
-    }
-  }
+		// If PWM values are between 0 to 255
+	  if ((redPWMValue > 0 && redPWMValue < arrValue) || (greenPWMValue > 0 && greenPWMValue < arrValue) || (bluePWMValue > 0 && bluePWMValue < arrValue))
+		{
+			// If sensor value is between 1000(BASE) and 1347(BASE)
+			if ((AcquisitionValue > TSC_MIN_THRESHOLD) && (AcquisitionValue < TSC_MAX_THRESHOLD))
+			{
+				// If Steady-state sensor then default > 1340
+				if (AcquisitionValue > TSC_LOW_MAXTHRESHOLD)
+				{
+					 redPWMValue = redPWMValue;
+					 greenPWMValue = greenPWMValue;
+					 bluePWMValue = bluePWMValue;
+				}
+				// If sensor value is between 1340(LOW) and 1325(MED)  -----> Low brightness PWM = 10%
+				if ((AcquisitionValue > TSC_MEDIUM_MAXTHRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
+				{
+					 redPWMValue = redPWMValue*0.10;
+					 greenPWMValue = greenPWMValue*0.10;
+					 bluePWMValue = bluePWMValue*0.10;
+				}
+				
+				// if sensor value is between 1325(MED) and 1300(HIGH) ----> Medium brightness PWM = 50%
+				if ((AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD) && (AcquisitionValue > TSC_HIGH_MAXTHRESHOLD))
+				{
+					 redPWMValue = redPWMValue*0.50;
+					 greenPWMValue = greenPWMValue*0.50;
+					 bluePWMValue = bluePWMValue*0.50;
+				}
+				
+				// If sensor value is between 1300(HIGH) and lower ----> High brightness PWM = 100%
+				if (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD)
+				{
+					 redPWMValue = redPWMValue;
+					 greenPWMValue = greenPWMValue;
+					 bluePWMValue = bluePWMValue;
+				}		
+			}
+		}
 				
   
   // Assign PWM values to data to send over USART 3
