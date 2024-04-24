@@ -422,7 +422,7 @@
             <File>
               <FileName>tsc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Linear Touch Sensor\TSC_test\MDK-ARM\tsc.c</FilePath>
+              <FilePath>..\Core\Src\tsc.c</FilePath>
             </File>
           </Files>
         </Group>

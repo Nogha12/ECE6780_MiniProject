@@ -6,6 +6,9 @@
 *.uvguix*
 *.uvoptx
 
+# Visual Studio Files
+/.vscode*
+
 # Build Folder
 /MDK-ARM/ECE6780_MiniProject
 
