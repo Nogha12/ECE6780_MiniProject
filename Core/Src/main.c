@@ -218,6 +218,8 @@ void LED_Transmit_Loop()
   static uint8_t greenPWMValue = 0;
   static uint8_t bluePWMValue = 0;
   
+  static int brightnessDivisor = 1;
+  
   static LED_Data redData = {RED, NULL};
   static LED_Data greenData = {GREEN, NULL};
   static LED_Data blueData = {BLUE, NULL};
@@ -262,51 +264,32 @@ void LED_Transmit_Loop()
 	
 	// Touch sensing acquisition
 	AcquisitionValue = TSC_acquisition();
-	
-		// If PWM values are between 0 to 255
-	  if ((redPWMValue > 0 && redPWMValue < arrValue) || (greenPWMValue > 0 && greenPWMValue < arrValue) || (bluePWMValue > 0 && bluePWMValue < arrValue))
-		{
-			// If sensor value is between 1000(BASE) and 1347(BASE)
-			if ((AcquisitionValue > TSC_MIN_THRESHOLD) && (AcquisitionValue < TSC_MAX_THRESHOLD))
-			{
-				// If Steady-state sensor then default > 1340
-				if (AcquisitionValue > TSC_LOW_MAXTHRESHOLD)
-				{
-					 redPWMValue = redPWMValue;
-					 greenPWMValue = greenPWMValue;
-					 bluePWMValue = bluePWMValue;
-				}
-				// If sensor value is between 1340(LOW) and 1325(MED)  -----> Low brightness PWM = 10%
-				if ((AcquisitionValue > TSC_MEDIUM_MAXTHRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
-				{
-					 redPWMValue = redPWMValue*0.10;
-					 greenPWMValue = greenPWMValue*0.10;
-					 bluePWMValue = bluePWMValue*0.10;
-				}
-				
-				// if sensor value is between 1325(MED) and 1300(HIGH) ----> Medium brightness PWM = 50%
-				if ((AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD) && (AcquisitionValue > TSC_HIGH_MAXTHRESHOLD))
-				{
-					 redPWMValue = redPWMValue*0.50;
-					 greenPWMValue = greenPWMValue*0.50;
-					 bluePWMValue = bluePWMValue*0.50;
-				}
-				
-				// If sensor value is between 1300(HIGH) and lower ----> High brightness PWM = 100%
-				if (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD)
-				{
-					 redPWMValue = redPWMValue;
-					 greenPWMValue = greenPWMValue;
-					 bluePWMValue = bluePWMValue;
-				}		
-			}
-		}
-				
+
+  // If sensor value is in the idle range, leave as is
+  if ((AcquisitionValue > TSC_IDLE_MINTHRESHOLD) && (AcquisitionValue < TSC_IDLE_MAXTHRESHOLD))
+  {
+     brightnessDivisor = brightnessDivisor;
+  }
+  // If sensor value is in the low range -----> Low brightness PWM = 10%
+  else if ((AcquisitionValue > TSC_LOW_MINTHRESHOLD) && (AcquisitionValue < TSC_LOW_MAXTHRESHOLD))
+  {
+     brightnessDivisor = 10;
+  }
+  // If sensor value is in the medium range ----> Medium brightness PWM = 50%
+  else if ((AcquisitionValue > TSC_MEDIUM_MINTHRESHOLD) && (AcquisitionValue < TSC_MEDIUM_MAXTHRESHOLD))
+  {
+     brightnessDivisor = 2;
+  }
+  // If sensor value is in the high range ----> High brightness PWM = 100%
+  else if ((AcquisitionValue > TSC_HIGH_MINTHRESHOLD) && (AcquisitionValue < TSC_HIGH_MAXTHRESHOLD))
+  {
+     brightnessDivisor = 1;
+  }
   
   // Assign PWM values to data to send over USART 3
-  redData.data = redPWMValue;
-  greenData.data = greenPWMValue;
-  blueData.data = bluePWMValue;
+  redData.data = redPWMValue / brightnessDivisor;
+  greenData.data = greenPWMValue / brightnessDivisor;
+  blueData.data = bluePWMValue / brightnessDivisor;
   
   // Send color data over USART 3
   USART3_txColorData(redData);
@@ -316,6 +299,7 @@ void LED_Transmit_Loop()
 
 /**
   * @brief Receives PWM values over USART and sets the colors' brightness values
+  *        and denoises the signal by only allowing values within 5 of the previous
   */
 void LED_Process_Color(uint8_t data)
 {
