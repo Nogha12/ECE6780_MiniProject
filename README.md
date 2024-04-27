@@ -26,7 +26,7 @@ We will develop an LED driver that can interface with an off-the-shelf LED strip
 ### Linear Tuch Sensor:
 Capacitive sensing technology is able to detect finger presence near an electrode that is protected from direct touch by a dielectric (for example glass, plastic). The capacitive variation introduced by the finger (or any conductive object) is measured using a proven implementation based on a surface charge transfer acquisition principle.
 
-(image)
+![BlockDiagram](/assets/images/TSC/Surface_charge_transfer.png)
 
 The surface charge transfer acquisition is a proven, robust and efficient way to measure a capacitance. It uses a minimum number of external components to operate with a single ended electrode type. This acquisition is designed around an analog I/O group composed of up to four GPIOs. Several analog I/O groups are available to allow the acquisition of several capacitive sensing channels simultaneously and to support a larger number of capacitive sensing channels. Within a same analog I/O group, the acquisition of the capacitive sensing channels is sequential. One of the GPIOs is dedicated to the sampling capacitor CS. Only one sampling capacitor I/O per analog I/O group must be enabled at a time. The remaining GPIOs are dedicated to the electrodes and are commonly called channels. For some specific needs (such as proximity detection), it is possible to simultaneously enable more than one channel per analog I/O group.
 
