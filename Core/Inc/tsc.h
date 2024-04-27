@@ -17,14 +17,14 @@
 //#define TSC_LOW_MAXTHRESHOLD    	(1340)
 //#define TSC_MEDIUM_MAXTHRESHOLD 	(1325)
 //#define TSC_HIGH_MAXTHRESHOLD   	(1300)
-#define TSC_IDLE_MINTHRESHOLD     (1310)
-#define TSC_IDLE_MAXTHRESHOLD     (1330)
-#define TSC_LOW_MINTHRESHOLD     (1248)
-#define TSC_LOW_MAXTHRESHOLD     (1253)
-#define TSC_MEDIUM_MINTHRESHOLD     (1290)
-#define TSC_MEDIUM_MAXTHRESHOLD     (1393)
-#define TSC_HIGH_MINTHRESHOLD     (1241)
-#define TSC_HIGH_MAXTHRESHOLD     (1246)
+#define TSC_IDLE_MINTHRESHOLD     (1330)
+#define TSC_IDLE_MAXTHRESHOLD     (1355)
+#define TSC_LOW_MINTHRESHOLD     (1270)
+#define TSC_LOW_MAXTHRESHOLD     (1274)
+#define TSC_MEDIUM_MINTHRESHOLD     (1314)
+#define TSC_MEDIUM_MAXTHRESHOLD     (1316)
+#define TSC_HIGH_MINTHRESHOLD     (1260)
+#define TSC_HIGH_MAXTHRESHOLD     (1268)
 
 /****************  Function prototypes (setup/initialization)  ****************/
 void PollingTSC();

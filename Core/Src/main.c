@@ -51,6 +51,8 @@ const int arrValue = 255;
 const int targetBaud = 9600;
 const int gyroSensitivity = 2000;
 
+int AcquisitionValue;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -228,7 +230,7 @@ void LED_Transmit_Loop()
   int16_t yValue;
   int16_t zValue;
 	
-	int AcquisitionValue;
+	//int AcquisitionValue;
   
   // read gyro values value
   xValue = (int16_t)I3G4250D_ReadRegister(I3G4250D_OUT_X_L_Addr, 2); // Read X low and high
