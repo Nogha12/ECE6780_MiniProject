@@ -23,7 +23,7 @@ We will develop an LED driver that can interface with an off-the-shelf LED strip
 - **Milestone #2:** The driver can map a normalized 3D vector to an RGB value.
 - **Milestone #3:** The gyroscope can be read and used to control the LEDs.
 
-### Linear Tuch Sensor:
+### Linear Touch Sensor:
 Capacitive sensing technology is able to detect finger presence near an electrode that is protected from direct touch by a dielectric (for example glass, plastic). The capacitive variation introduced by the finger (or any conductive object) is measured using a proven implementation based on a surface charge transfer acquisition principle.
 
 ![BlockDiagram](/assets/images/TSC/Surface_charge_transfer.png)
